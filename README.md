@@ -7,6 +7,9 @@ A simple script to backup your server to a email address as an encrypted compres
  - gzip: For compression
  - bash: language of the script
  
+## Limitations
+Mail is sent with the backup as an attachment, you may be limited by the attachment size of your mail provider if you are not using your own mail server. See the wishlist if you want to develop an alternative upload method.
+ 
 ## Usage
 
 ## How to Use
@@ -27,6 +30,12 @@ Description: Decrypt the file file.sql.gz.enc to file.sql
 
 ### Instructions & Examples
 See the post at: [soon]
+
+## Planned Features / Wishlist
+ - FTP Upload & HTTP Download
+ - Dropbox or Cloud service upload / download
+ 
+Feel free to submit a pull request.
 
 ## License
 The MIT License (MIT). See LICENSE.
