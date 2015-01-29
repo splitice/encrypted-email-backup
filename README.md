@@ -1,6 +1,8 @@
 # encrypted-email-backup
 A simple script to backup your server to a email address as an encrypted compressed backup. The script itself is independent of your software being backed up, just pipe it the the backup (for multiple files, use tar).
 
+Developed to support an article sponsored by the [VpsBoard](https://www.vpsboard.com/) article bounty program.
+
 ## Requirements
  - mutt: To send emails
  - openssl: For encryption
@@ -29,7 +31,7 @@ Description: Decrypt the file file.sql.gz.enc to file.sql
 ```
 
 ### Instructions & Examples
-See the post at: [soon]
+See the post at: https://vpsboard.com/page/index.html/_/linux-vps-tutorials/how-to-create-secure-linux-server-backups
 
 ## Planned Features / Wishlist
  - FTP Upload & HTTP Download
