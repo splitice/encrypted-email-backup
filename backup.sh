@@ -31,7 +31,7 @@ function do_encrypt {
 	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
 		cat - | openssl enc -aes-256-cbc -kfile "$1" -z
 	else
-		cat - | openssl smime -encrypt -aes256 -in file -binary -outform DEM "$1" -z
+		cat - | gzip | openssl smime -encrypt -aes256 -binary -outform DEM "$1"
 	fi
 }
 
@@ -65,7 +65,7 @@ function do_decrypt {
 	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
 		cat - | openssl enc -aes-256-cbc -d -kfile "$1" -z
 	else
-		cat - | openssl smime -decrypt -binary -inform DEM -inkey "$1" -z
+		cat - | openssl smime -decrypt -binary -inform DEM -inkey "$1" | gzip -d
 	fi
 }
 
