@@ -21,7 +21,7 @@ function do_backup {
                 rm "$BACKUP_FILE"
         fi
 
-        cat - | gzip | openssl enc -aes-256-cbc -kfile "$4" > "$BACKUP_FILE"
+        cat - | openssl enc -aes-256-cbc -kfile "$4" -z > "$BACKUP_FILE"
         STATUS=$?
 
         if [[ $STATUS != "0" ]]; then
@@ -39,7 +39,7 @@ function do_backup {
 }
 
 function do_decrypt {
-        cat - | openssl enc -aes-256-cbc -d -kfile "$1" | gzip -d
+        cat - | openssl enc -aes-256-cbc -d -kfile "$1" -z
 }
 
 case $1 in

@@ -5,8 +5,7 @@ Developed to support an article sponsored by the [VpsBoard](https://www.vpsboard
 
 ## Requirements
  - mutt: To send emails
- - openssl: For encryption
- - gzip: For compression
+ - openssl: For encryption, compiled with zlib support
  - bash: language of the script
  
 ## Limitations
