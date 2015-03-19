@@ -1,16 +1,39 @@
 #!/bin/bash
-NOW=$(date +"%Y-%m-%d") # dont touch
 
-## CONFIG
-BACKUP_KEY="$2"
+#####################################
+## CONFIG 
+#####################################
+
+# The type of encryption to use, options:
+#  - symmetric (keyfile)
+#  - asymmetric (public/private)
+ENCRYPTION_MODE="symmetric"
+
+# The key file path, defaults to a supplied parameter
+ENCRYPTION_KEY="$2"
+
+# A temporary directory to store the backup
 BACKUP_TMP="/tmp/"
 
 # Modes:
 #  - attach: Attach the encrypted backup as a file
 BACKUP_MODE="attach"
 
+#####################################
 ## PROCESS
+#####################################
+
+# No configuration below here
 NL=$'\n'
+NOW=$(date +"%Y-%m-%d") 
+
+function do_encrypt {
+	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
+		cat - | openssl enc -aes-256-cbc -kfile "$1" -z
+	else
+		cat - | openssl smime -encrypt -aes256 -in file -binary -outform DEM "$1" -z
+	elif
+}
 
 function do_backup {
 	BACKUP_FILE="$BACKUP_TMP$1.gz.enc"
@@ -21,7 +44,7 @@ function do_backup {
 		rm "$BACKUP_FILE"
 	fi
 
-	cat - | openssl enc -aes-256-cbc -kfile "$4" -z > "$BACKUP_FILE"
+	do_encrypt "$4" > "$BACKUP_FILE"
 	STATUS=$?
 
 	if [[ $STATUS != "0" ]]; then
@@ -39,16 +62,28 @@ function do_backup {
 }
 
 function do_decrypt {
-	cat - | openssl enc -aes-256-cbc -d -kfile "$1" -z
+	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
+		cat - | openssl enc -aes-256-cbc -d -kfile "$1" -z
+	else
+		cat - | openssl smime -decrypt -binary -inform DEM -inkey "$1" -z
+	elif
+}
+
+function create_keypair {
+	openssl req -x509 -nodes -newkey rsa:2048 -keyout "$1" -out "$2"
 }
 
 case $1 in
 "backup")
 	echo "Starting Backup"
-	do_backup "$3" "$4" "$5" "$BACKUP_KEY" "$BACKUP_MODE"
+	do_backup "$3" "$4" "$5" "$ENCRYPTION_KEY" "$BACKUP_MODE"
 	;;
 "decrypt")
-	do_decrypt "$BACKUP_KEY"
+	do_decrypt "$ENCRYPTION_KEY"
+	;;
+"keypair")
+	create_keypair "backup.key" "backup.pem"
+	echo "Keypair created as backup.key and backup.pem"
 	;;
 *)
 	echo "Encrypted Backup Script"
@@ -60,6 +95,9 @@ case $1 in
 	echo ""
 	echo "cat file.sql.gz.enc | ./backup.sh decrypt [KEY] > file.sql"
 	echo "Description: Decrypt the file file.sql.gz.enc to file.sql"
+	echo ""
+	echo "./backup.sh keypair"
+	echo "Description: Create a keypair suitable for use with the asymmetric encryption method"
 	echo ""
   ;;
 esac
