@@ -62,6 +62,9 @@ function do_backup {
 		echo "Backup Complete: $NOW" | mutt -a "$BACKUP_FILE" -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 	else 
 		FUNC="upload_$5"
+		if [[ -f "upload/$FUNC.sh" ]]; then
+			source "upload/$FUNC.sh"
+		fi
 		BACKUP_LINK=$(eval ${FUNC} "$BACKUP_FILE")
 		echo "Backup Complete: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 	fi
