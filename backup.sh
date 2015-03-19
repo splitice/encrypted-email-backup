@@ -27,6 +27,12 @@ BACKUP_MODE="attach"
 NL=$'\n'
 NOW=$(date +"%Y-%m-%d") 
 
+# If the file .backupconfig.sh exists then we will include it
+# You can override the configuration here!
+if [[ -f ".backupconfig.sh" ]]; then
+	source ".backupconfig.sh"
+fi
+
 function do_encrypt {
 	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
 		cat - | openssl enc -aes-256-cbc -kfile "$1" -z
