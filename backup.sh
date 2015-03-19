@@ -5,7 +5,13 @@ NOW=$(date +"%Y-%m-%d") # dont touch
 BACKUP_KEY="$2"
 BACKUP_TMP="/tmp/"
 
+# Modes:
+#  - attach: Attach the encrypted backup as a file
+BACKUP_MODE="attach"
+
 ## PROCESS
+NL=$'\n'
+
 function do_backup {
         BACKUP_FILE="$BACKUP_TMP$1.gz.enc"
         BACKUP_EMAIL="$2"
@@ -15,30 +21,34 @@ function do_backup {
                 rm "$BACKUP_FILE"
         fi
 
-        cat - | gzip | openssl enc -aes-256-cbc -kfile "$BACKUP_KEY" > "$BACKUP_FILE"
+        cat - | gzip | openssl enc -aes-256-cbc -kfile "$4" > "$BACKUP_FILE"
         STATUS=$?
 
         if [[ $STATUS != "0" ]]; then
                 echo "Backup Failed"
-                echo "Backup Failed" | mutt -a "$BACKUP_FILE" -s "[FAIL] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+                echo "Backup Failed" | mutt -s "[FAIL] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
         elif [[ "$1" == "output" ]] ; then
                 echo "Backup File: $BACKUP_FILE"
-        else
+        elif [[ "$5" == "attach" ]]; then
                 echo "Backup Complete: $NOW" | mutt -a "$BACKUP_FILE" -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+		else 
+				FUNC="upload_$5"
+				BACKUP_LINK=$(eval ${FUNC} "$BACKUP_FILE")
+                echo "Backup Complete: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
         fi
 }
 
 function do_decrypt {
-        cat - | openssl enc -aes-256-cbc -d -kfile "$BACKUP_KEY" | gzip -d
+        cat - | openssl enc -aes-256-cbc -d -kfile "$1" | gzip -d
 }
 
 case $1 in
 "backup")
         echo "Starting Backup"
-        do_backup "$3" "$4" "$5"
+        do_backup "$3" "$4" "$5" "$BACKUP_KEY" "$BACKUP_MODE"
         ;;
 "decrypt")
-        do_decrypt
+        do_decrypt "$BACKUP_KEY"
         ;;
 *)
         echo "Encrypted Backup Script"
