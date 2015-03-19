@@ -32,7 +32,7 @@ function do_encrypt {
 		cat - | openssl enc -aes-256-cbc -kfile "$1" -z
 	else
 		cat - | openssl smime -encrypt -aes256 -in file -binary -outform DEM "$1" -z
-	elif
+	fi
 }
 
 function do_backup {
@@ -66,7 +66,7 @@ function do_decrypt {
 		cat - | openssl enc -aes-256-cbc -d -kfile "$1" -z
 	else
 		cat - | openssl smime -decrypt -binary -inform DEM -inkey "$1" -z
-	elif
+	fi
 }
 
 function create_keypair {
