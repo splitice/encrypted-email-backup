@@ -5,6 +5,7 @@
 #####################################
 
 # The type of encryption to use, options:
+#  - unencrypted
 #  - symmetric (keyfile)
 #  - asymmetric (public/private)
 ENCRYPTION_MODE="symmetric"
@@ -36,8 +37,10 @@ fi
 function do_encrypt {
 	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
 		cat - | openssl enc -aes-256-cbc -kfile "$1" -z
-	else
+	elif [[ "$ENCRYPTION_MODE" == "asymmetric" ]]; then
 		cat - | gzip | openssl smime -encrypt -aes256 -binary -outform DEM "$1"
+	elif [[ "$ENCRYPTION_MODE" == "unencrypted" ]]; then
+		cat - | gzip
 	fi
 }
 
@@ -73,8 +76,10 @@ function do_backup {
 function do_decrypt {
 	if [[ "$ENCRYPTION_MODE" == "symmetric" ]]; then
 		cat - | openssl enc -aes-256-cbc -d -kfile "$1" -z
-	else
+	elif [[ "$ENCRYPTION_MODE" == "asymmetric" ]]; then
 		cat - | openssl smime -decrypt -binary -inform DEM -inkey "$1" | gzip -d
+	elif [[ "$ENCRYPTION_MODE" == "unencrypted" ]]; then
+		cat - | gzip -d
 	fi
 }
 
