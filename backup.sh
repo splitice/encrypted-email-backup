@@ -45,7 +45,12 @@ function do_encrypt {
 }
 
 function do_backup {
-	BACKUP_FILE="$BACKUP_TMP$1.gz.enc"
+	BACKUP_FILE="$BACKUP_TMP$1.gz"
+	
+	if [[ "$ENCRYPTION_MODE" != "unencrypted" ]]; then
+		BACKUP_FILE="$BACKUP_FILE.enc"
+	fi
+	
 	BACKUP_EMAIL="$2"
 	BACKUP_SUBJECT="$3 - $NOW"
 
