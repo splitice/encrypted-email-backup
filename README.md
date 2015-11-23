@@ -3,6 +3,12 @@ A simple script to backup your server to a email address as an encrypted compres
 
 Developed to support an article sponsored by the [VpsBoard](https://www.vpsboard.com/) article bounty program.
 
+## Features
+ - Assymetric and Symetric encryption modes
+ - Backup compression
+ - Simple
+ - Reports backup failures via email
+
 ## Requirements
  - mutt: To send emails
  - openssl: For encryption, compiled with zlib support
