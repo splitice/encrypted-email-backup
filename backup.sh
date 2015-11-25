@@ -30,8 +30,9 @@ NOW=$(date +"%Y-%m-%d")
 
 # If the file .backupconfig.sh exists then we will include it
 # You can override the configuration here!
-if [[ -f ".backupconfig.sh" ]]; then
-	source ".backupconfig.sh"
+BACKUP_CONFIG=$(dirname "$0")/.backupconfig.sh
+if [[ -f "$BACKUP_CONFIG" ]]; then
+	source "$BACKUP_CONFIG"
 fi
 
 function do_encrypt {
