@@ -1,6 +1,8 @@
 #!/bin/bash
+GDRIVE_FOLDER=${GDRIVE_FOLDER-backups}
 
 function upload_gdrive {
-	ID=$(drive upload --file "$1" | grep "Id:" | awk '{print $2}')
+	FOLDER_ID=$(drive folder --title "$GDRIVE_FOLDER" | grep "Id:" | awk '{print $2}')
+	ID=$(drive upload --file "$1" --parent "$FOLDER_ID" | grep "Id:" | awk '{print $2}')
 	drive url --id "$ID"
 }
