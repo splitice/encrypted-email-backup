@@ -45,6 +45,13 @@ function do_encrypt {
 	fi
 }
 
+function trim() {
+    local var="$*"
+    var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"   # remove trailing whitespace characters
+    echo -n "$var"
+}
+
 function do_backup {
 	BACKUP_FILE="$BACKUP_TMP$1.gz"
 	
@@ -71,11 +78,17 @@ function do_backup {
 		echo "Backup Complete: $NOW" | mutt -a "$BACKUP_FILE" -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 	else 
 		FUNC="upload_$5"
-		if [[ -f "upload/$FUNC.sh" ]]; then
-			source "upload/$FUNC.sh"
+		if [[ -f $(dirname "$0")"/upload/$FUNC.sh" ]]; then
+			source $(dirname "$0")"/upload/$FUNC.sh"
 		fi
-		BACKUP_LINK=$(eval ${FUNC} "$BACKUP_FILE")
-		echo "Backup Complete: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+		BACKUP_LINK=$(trim $(eval ${FUNC} "$BACKUP_FILE"))
+		if [[ "z$BACKUP_LINK" == "z" ]]; then
+			echo "Backup Failed"
+			echo "Backup Upload Failed: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+		else
+			echo "Backup Complete"
+			echo "Backup Complete: ${NOW}" | mutt -s "[FAIL] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+		fi
 	fi
 }
 
