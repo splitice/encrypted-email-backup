@@ -84,10 +84,10 @@ function do_backup {
 		BACKUP_LINK=$(trim $(eval ${FUNC} "$BACKUP_FILE"))
 		if [[ "z$BACKUP_LINK" == "z" ]]; then
 			echo "Backup Failed"
-			echo "Backup Upload Failed: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+			echo "Backup Upload Failed: ${NOW}" | mutt -s "[FAIL] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 		else
 			echo "Backup Complete"
-			echo "Backup Complete: ${NOW}" | mutt -s "[FAIL] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+			echo "Backup Complete: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 		fi
 	fi
 }
