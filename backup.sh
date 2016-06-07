@@ -26,7 +26,7 @@ BACKUP_MODE="attach"
 
 # No configuration below here
 NL=$'\n'
-NOW=$(date +"%Y-%m-%d") 
+NOW=$(date +"%Y-%m-%d_%H-%M-%S") 
 
 # If the file .backupconfig.sh exists then we will include it
 # You can override the configuration here!
@@ -53,7 +53,7 @@ function trim() {
 }
 
 function do_backup {
-	BACKUP_FILE="$BACKUP_TMP$1.gz"
+	BACKUP_FILE="$BACKUP_TMP$1-$NOW.gz"
 	
 	if [[ "$ENCRYPTION_MODE" != "unencrypted" ]]; then
 		BACKUP_FILE="$BACKUP_FILE.enc"
@@ -86,8 +86,9 @@ function do_backup {
 			echo "Backup Failed"
 			echo "Backup Upload Failed: ${NOW}" | mutt -s "[FAIL] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 		else
+			BACKUP_SIZE=$(du -hs "$BACKUP_FILE" | awk '{print $1}')
 			echo "Backup Complete"
-			echo "Backup Complete: ${NOW}${NL}Backup Link:${BACKUP_LINK}" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
+			echo "Backup Complete: ${NOW}${NL}Backup Link:${BACKUP_LINK} (${BACKUP_SIZE})" | mutt -s "[OK] $BACKUP_SUBJECT" -- "$BACKUP_EMAIL"
 		fi
 	fi
 }
